@@ -1,0 +1,5 @@
+.idea/
+1/.ipynb_checkpoints/
+__pycache__/
+catboost_info/
+submission*.csv

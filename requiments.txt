@@ -1,0 +1,20 @@
+# Core
+numpy
+pandas
+scikit-learn
+
+# Boosting
+catboost
+lightgbm
+xgboost
+
+# Hyperparameter tuning
+optuna
+optuna-integration
+
+# Visualization (EDA)
+matplotlib
+seaborn
+
+# Notebooks
+jupyter
