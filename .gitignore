@@ -1,5 +1,35 @@
-.idea/
-1/.ipynb_checkpoints/
+# Python
 __pycache__/
-catboost_info/
-submission*.csv
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Data
+data/raw/*.csv
+data/processed/*.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Models & submissions
+models/*.pkl
+submissions/*.csv
+!models/.gitkeep
+!submissions/.gitkeep
+
+# Reports
+reports/figures/*.png
+
+# OS
+.DS_Store
+Thumbs.db
