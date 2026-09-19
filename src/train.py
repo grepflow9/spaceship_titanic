@@ -9,6 +9,8 @@ from optuna.exceptions import ExperimentalWarning
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import GridSearchCV
 
+import time
+
 import src.config as config
 import warnings
 from src.models import build_pipeline, evaluate_model, prepare_catboost
@@ -16,6 +18,19 @@ from src.models import build_pipeline, evaluate_model, prepare_catboost
 warnings.filterwarnings('ignore', category=ExperimentalWarning)
 warnings.filterwarnings('ignore', category=FutureWarning, module='optuna')
 optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+
+def format_time(seconds):
+    """Format elapsed time into human-readable string."""
+    if seconds < 60:
+        return "%.1fs" % seconds
+    elif seconds < 3600:
+        m, s = divmod(seconds, 60)
+        return "%dm %.1fs" % (m, s)
+    else:
+        h, rem = divmod(seconds, 3600)
+        m, s = divmod(rem, 60)
+        return "%dh %dm %.1fs" % (h, m, s)
 
 
 def evaluate_all(df, models=None, cv=None):
@@ -73,10 +88,13 @@ def tune_model_gridsearch(df, model_name, param_grid, cv=None, verbose=True):
         n_jobs=-1,
         verbose=0,
     )
+    # Тайминг
+    t0 = time.time()
     search.fit(X, y)
+    elapsed = time.time() - t0
 
     if verbose:
-        print(f'{model_name:20s}: {search.best_score_:.4f}')
+        print(f'{model_name:20s}: {search.best_score_:.4f}  [{format_time(elapsed)}]')
         print(f'    best_params: {search.best_params_}')
 
     return search
@@ -115,10 +133,13 @@ def tune_model_optuna(df, model_name, param_distributions, n_trials=30,
         random_state=config.RANDOM_STATE,
         verbose=0,
     )
+    # Тайминг
+    t0 = time.time()
     search.fit(X, y)
+    elapsed = time.time() - t0
 
     if verbose:
-        print(f'{model_name:20s}: {search.best_score_:.4f}')
+        print(f'{model_name:20s}: {search.best_score_:.4f}  [{format_time(elapsed)}]')
         print(f'    best_params: {search.best_params_}')
 
     return search
@@ -142,37 +163,49 @@ def tune_all(df, param_grids, param_optuna,
 
     for name in models:
         if use_gridsearch and name in param_grids:
+            t0 = time.time()
             search = tune_model_gridsearch(
                 df, name,
                 param_grid=param_grids[name],
-                cv=cv, verbose=True,
+                cv=cv, verbose=False,
             )
+            elapsed = time.time() - t0
             results.append({
                 'model':       name,
                 'method':      'GridSearch',
                 'accuracy':    search.best_score_,
                 'best_params': search.best_params_,
+                'time':        elapsed,
             })
             best_searches[name] = search
 
         if use_optuna and name in param_optuna:
+            t0 = time.time()
             search = tune_model_optuna(
                 df, name,
                 param_distributions=param_optuna[name],
-                n_trials=n_trials, cv=cv, verbose=True,
+                n_trials=n_trials, cv=cv, verbose=False,
             )
+            elapsed = time.time() - t0
             results.append({
                 'model':       name,
                 'method':      'Optuna',
                 'accuracy':    search.best_score_,
                 'best_params': search.best_params_,
+                'time':        elapsed,
             })
             best_searches[name] = search
 
     df_results = (pd.DataFrame(results)
                     .sort_values('accuracy', ascending=False)
                     .reset_index(drop=True))
+    # Добавляем колонку с форматированным временем
+    df_results['time_fmt'] = df_results['time'].apply(format_time)
+    # Форматируем best_params для отображения
+    df_results['best_params'] = df_results['best_params'].apply(
+        lambda x: ', '.join(f'{k}={v}' for k, v in x.items())
+    )
     print()
-    print(df_results[['model', 'method', 'accuracy']].to_string(index=False))
+    print(df_results[['model', 'method', 'accuracy', 'time_fmt', 'best_params']].to_string(index=False))
 
     return df_results, best_searches
