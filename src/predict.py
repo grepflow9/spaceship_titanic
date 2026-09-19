@@ -97,7 +97,7 @@ def ensemble(train, test, test_ids, best_params,
         pd.DataFrame({
             'PassengerId': test_ids,
             'Transported': (probs > threshold).astype(bool),
-        }).to_csv(f'submission/submission_{name.lower()}.csv', index=False)
+        }).to_csv(f'submissions/submission_{name.lower()}.csv', index=False)
 
     # Усреднение
     if weights is None:
