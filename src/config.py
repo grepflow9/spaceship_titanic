@@ -16,7 +16,6 @@ from xgboost import XGBClassifier
 SHOW_TABLE_RESULT = 1     # 1 — показать таблицу с базовыми моделями
 FIND_THE_BEST_PARAM = 1   # 1 — запускать тюнинг, 0 — пропустить
 
-N_TRIALS = 10             # количество trials для Optuna
 N_SPLITS = 5              # количество фолдов для CV
 RANDOM_STATE = 42         # seed для воспроизводимости
 
@@ -101,14 +100,16 @@ MODELS = {
 # ---------------------------------------------------------------------------
 # Единые параметры тюнинга с указанием метода
 # ---------------------------------------------------------------------------
-# Каждая модель: {'method': 'grid' | 'optuna', 'params': {...}}
-# 'grid'  -> передаётся в GridSearchCV (списки значений)
-# 'optuna' -> передаётся в OptunaSearchCV (optuna.distributions)
+# Каждая модель:
+#   {'method': 'grid' | 'optuna', 'n_trials': N, 'params': {...}}
+# 'grid'  -> n_trials игнорируется (GridSearchCV работает по сетке)
+# 'optuna' -> n_trials передаётся в OptunaSearchCV
 # ---------------------------------------------------------------------------
 PARAMS = {
     # ===== GridSearch (малые сетки, быстро) =====
     'KNN': {
-        'method': 'grid',
+        'method':   'grid',
+        'n_trials': None,
         'params': {
             'knn__n_neighbors': [3, 5, 7, 9, 12, 15],
             'knn__weights':     ['uniform', 'distance'],
@@ -116,25 +117,29 @@ PARAMS = {
         },
     },
     'LogReg': {
-        'method': 'grid',
+        'method':   'grid',
+        'n_trials': None,
         'params': {
             'clf__C': [0.01, 0.1, 0.5, 1.0, 5.0, 10.0],
         },
     },
     'LogReg_Lasso': {
-        'method': 'grid',
+        'method':   'grid',
+        'n_trials': None,
         'params': {
             'clf__C': [0.01, 0.1, 1, 10],
         },
     },
     'LogReg_Ridge': {
-        'method': 'grid',
+        'method':   'grid',
+        'n_trials': None,
         'params': {
             'clf__C': [0.01, 0.1, 1, 10],
         },
     },
     'LogReg_ElasticNet': {
-        'method': 'grid',
+        'method':   'grid',
+        'n_trials': None,
         'params': {
             'clf__C':        [0.01, 0.1, 1, 10],
             'clf__l1_ratio': [0.2, 0.5, 0.8],
@@ -142,9 +147,10 @@ PARAMS = {
     },
     # ===== Optuna (большие пространства, гибкий поиск) =====
     'RandomForest': {
-        'method': 'optuna',
+        'method':   'optuna',
+        'n_trials': 12,
         'params': {
-            'rfc__n_estimators':      optuna.distributions.IntDistribution(300, 500, step=100),
+            'rfc__n_estimators':      optuna.distributions.IntDistribution(200, 400, step=100),
             'rfc__max_depth':         optuna.distributions.IntDistribution(8, 15),
             'rfc__min_samples_split': optuna.distributions.IntDistribution(2, 10),
             'rfc__min_samples_leaf':  optuna.distributions.IntDistribution(1, 5),
@@ -152,7 +158,8 @@ PARAMS = {
         },
     },
     'LGBM': {
-        'method': 'optuna',
+        'method':   'optuna',
+        'n_trials': 20,
         'params': {
             'lgbm__n_estimators':      optuna.distributions.IntDistribution(400, 1500, step=100),
             'lgbm__num_leaves':        optuna.distributions.IntDistribution(15, 63),
@@ -162,7 +169,8 @@ PARAMS = {
         },
     },
     'XGB': {
-        'method': 'optuna',
+        'method':   'optuna',
+        'n_trials': 20,
         'params': {
             'xgb__n_estimators':     optuna.distributions.IntDistribution(400, 900, step=100),
             'xgb__max_depth':        optuna.distributions.IntDistribution(3, 7),
@@ -171,9 +179,10 @@ PARAMS = {
         },
     },
     'CatBoost': {
-        'method': 'optuna',
+        'method':   'optuna',
+        'n_trials': 50,
         'params': {
-            'cat__iterations':    optuna.distributions.IntDistribution(400, 1000, step=100),
+            'cat__iterations':    optuna.distributions.IntDistribution(300, 1500, step=100),
             'cat__depth':         optuna.distributions.IntDistribution(5, 7),
             'cat__learning_rate': optuna.distributions.FloatDistribution(0.01, 0.08, log=True),
             'cat__l2_leaf_reg':   optuna.distributions.FloatDistribution(1, 5),

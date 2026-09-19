@@ -43,7 +43,6 @@ def main():
         tuned_results, tuned_searches = tune_all(
             train,
             params=config.PARAMS,
-            n_trials=config.N_TRIALS,
         )
 
     # 5. Финальный сабмит

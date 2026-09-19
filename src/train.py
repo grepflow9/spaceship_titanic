@@ -145,12 +145,12 @@ def tune_model_optuna(df, model_name, param_distributions, n_trials=30,
     return search
 
 
-def tune_all(df, params, n_trials=30, cv=None, models=None):
+def tune_all(df, params, cv=None, models=None):
     """
     Перебирает модели и подбирает гиперпараметры выбранным методом.
     
     params — единый словарь config.PARAMS:
-        {model_name: {'method': 'grid'|'optuna', 'params': {...}}}
+        {model_name: {'method': 'grid'|'optuna', 'n_trials': N, 'params': {...}}}
     """
     if cv is None:
         cv = StratifiedKFold(n_splits=config.N_SPLITS, shuffle=True,
@@ -187,6 +187,8 @@ def tune_all(df, params, n_trials=30, cv=None, models=None):
             best_searches[name] = search
 
         elif method == 'optuna':
+            # Читаем n_trials из params[name], а не из глобального config
+            n_trials = params[name].get('n_trials', 30)
             t0 = time.time()
             search = tune_model_optuna(
                 df, name,
