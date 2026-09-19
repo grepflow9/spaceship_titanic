@@ -42,10 +42,7 @@ def main():
         print("\n=== Тюнинг ===")
         tuned_results, tuned_searches = tune_all(
             train,
-            param_grids=config.PARAM_GRIDS,
-            param_optuna=config.PARAM_OPTUNA,
-            use_gridsearch=config.USE_GRIDSEARCH,
-            use_optuna=config.USE_OPTUNA,
+            params=config.PARAMS,
             n_trials=config.N_TRIALS,
         )
 
@@ -59,10 +56,6 @@ def main():
             best_params=config.BEST_PARAMS,
             output_path='submissions/submission.csv',
         )
-
-
-    elapsed = time.time() - time_start
-    print(f"\n [TIME] Время: {elapsed:.2f} сек")
 
 
 if __name__ == '__main__':
