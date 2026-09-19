@@ -26,6 +26,7 @@ models/*.pkl
 submissions/*.csv
 !models/.gitkeep
 !submissions/.gitkeep
+catboost_info/
 
 # Reports
 reports/figures/*.png
