@@ -43,7 +43,7 @@ def fit_final_model(train, model_name, best_params, numeric_cols=None,
 
 
 def make_submission(pipe, test, test_ids, threshold=0.5,
-                    output_path='submission.csv'):
+                    output_path='submissions/submission.csv'):
     """
     Сохраняет предсказания модели в CSV.
     """
@@ -62,7 +62,7 @@ def make_submission(pipe, test, test_ids, threshold=0.5,
 def ensemble(train, test, test_ids, best_params,
              numeric_cols=None, category_cols=None,
              weights=None, threshold=0.5,
-             output_path='submission/submission.csv'):
+             output_path='submissions/submission.csv'):
     """
     Обучает модели из best_params, усредняет probs, сохраняет сабмит.
     """
