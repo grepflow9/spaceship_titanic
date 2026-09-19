@@ -89,7 +89,7 @@ MODELS = {
         'cls':    CatBoostClassifier,
         'prefix': 'cat',
         'params': {
-            'iterations': 1000, 'depth': 6, 'learning_rate': 0.02,
+            'iterations': 1100, 'depth': 7, 'learning_rate': 0.01457,
             'l2_leaf_reg': 3, 'random_seed': RANDOM_STATE,
             'verbose': 0, 'task_type': 'CPU',
         },
@@ -148,7 +148,7 @@ PARAMS = {
     # ===== Optuna (большие пространства, гибкий поиск) =====
     'RandomForest': {
         'method':   'optuna',
-        'n_trials': 12,
+        'n_trials': 10,
         'params': {
             'rfc__n_estimators':      optuna.distributions.IntDistribution(200, 400, step=100),
             'rfc__max_depth':         optuna.distributions.IntDistribution(8, 15),
@@ -180,7 +180,7 @@ PARAMS = {
     },
     'CatBoost': {
         'method':   'optuna',
-        'n_trials': 50,
+        'n_trials': 15,
         'params': {
             'cat__iterations':    optuna.distributions.IntDistribution(300, 1500, step=100),
             'cat__depth':         optuna.distributions.IntDistribution(5, 7),
