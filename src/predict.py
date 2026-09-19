@@ -62,7 +62,7 @@ def make_submission(pipe, test, test_ids, threshold=0.5,
 def ensemble(train, test, test_ids, best_params,
              numeric_cols=None, category_cols=None,
              weights=None, threshold=0.5,
-             output_path='submission.csv'):
+             output_path='submission/submission.csv'):
     """
     Обучает модели из best_params, усредняет probs, сохраняет сабмит.
     """
@@ -97,7 +97,7 @@ def ensemble(train, test, test_ids, best_params,
         pd.DataFrame({
             'PassengerId': test_ids,
             'Transported': (probs > threshold).astype(bool),
-        }).to_csv(f'submission_{name.lower()}.csv', index=False)
+        }).to_csv(f'submission/submission_{name.lower()}.csv', index=False)
 
     # Усреднение
     if weights is None:
