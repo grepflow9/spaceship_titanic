@@ -53,7 +53,7 @@ def main():
             test=test,
             test_ids=test_ids,
             best_params=config.BEST_PARAMS,
-            weights={'CatBoost': 3.0, 'XGB': 1.0, 'LGBM': 0.5},
+            weights={'CatBoost': 3.0, 'XGB': 1.0, 'LGBM': 0.0},
             output_path='submissions/submission.csv',
         )
 
